@@ -1,6 +1,6 @@
 #!/bin/bash
 
-mkfifo .botfile
+mkfifo ./.botfile
 chan=$1
 if [ $2 != '' ] && [ -f $2 ] ; then
   key=`cat $2`
@@ -17,9 +17,9 @@ killcode="@bots die plz"
 
 tail -f .botfile | openssl s_client -connect irc.cat.pdx.edu:6697 | while true; do
   if [[ -z $started ]] ; then
-    echo "USER $ircnick $ircnick $ircnick :$ircnick" >> .botfile
-    echo "NICK $ircnick" >> .botfile
-    echo "JOIN #$chan $key" >> .botfile
+    echo "USER $ircnick $ircnick $ircnick :$ircnick" >> ./.botfile
+    echo "NICK $ircnick" >> ./.botfile
+    echo "JOIN #$chan $key" >> ./.botfile
     started="yes"
   fi
 
@@ -31,13 +31,13 @@ tail -f .botfile | openssl s_client -connect irc.cat.pdx.edu:6697 | while true; 
     nick="${irc%%!*}"; nick="${nick#:}"
     if [[ $nick != $ircnick ]] ; then
       chan=`echo $irc | cut -d ' ' -f 3`
-      echo "PRIVMSG $chan :Hello from $host!" >> .botfile
+      echo "PRIVMSG $chan :Hello from $host!" >> ./.botfile
     fi
   elif `echo $irc | grep PRIVMSG | grep "$killcode" > /dev/null` ; then
     nick="${irc%%!*}"; nick="${nick#:}"
     if [[ $nick != $ircnick ]] ; then
       chan=`echo $irc | cut -d ' ' -f 3`
-      #echo "PRIVMSG $chan :Goodbye from $host!" >> .botfile
+      #echo "PRIVMSG $chan :Goodbye from $host!" >> ./.botfile
       kill $$ #die die die current bash
       kill `ps aux | grep $USER | grep -v grep | grep .botfile | awk '{print $2}'`
       exit 3; #3 for killed becase, yeah
