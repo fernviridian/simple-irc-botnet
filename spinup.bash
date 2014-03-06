@@ -6,7 +6,7 @@
 #$1 is channel to join, $2 is path to channel key
 
 for host in `cat hosts.txt` ; do
-    ssh $host ``cat path.txt` $1 $2` &
+    ssh $host `cat path.txt` $1 $2 &
 done
 
 
