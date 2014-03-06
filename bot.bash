@@ -12,7 +12,8 @@ host=`hostname`
 ircnick=$host-"bot"
 
 #command to listen for
-command="@bots say hello"
+listencommand="@bots say hello"
+killcode="@bots die plz"
 
 tail -f .botfile | openssl s_client -connect irc.cat.pdx.edu:6697 | while true; do
   if [[ -z $started ]] ; then
@@ -26,11 +27,21 @@ tail -f .botfile | openssl s_client -connect irc.cat.pdx.edu:6697 | while true; 
   echo $irc
   if `echo $irc | cut -d ' ' -f 1 | grep PING > /dev/null` ; then
     echo "PONG" >> .botfile
-  elif `echo $irc | grep PRIVMSG | grep "$command" > /dev/null` ; then
+  elif `echo $irc | grep PRIVMSG | grep "$listencommand" > /dev/null` ; then
     nick="${irc%%!*}"; nick="${nick#:}"
     if [[ $nick != $ircnick ]] ; then
       chan=`echo $irc | cut -d ' ' -f 3`
       echo "PRIVMSG $chan :Hello from $host!" >> .botfile
     fi
+  elif `echo $irc | grep PRIVMSG | grep "$killcode" > /dev/null` ; then
+    nick="${irc%%!*}"; nick="${nick#:}"
+    if [[ $nick != $ircnick ]] ; then
+      chan=`echo $irc | cut -d ' ' -f 3`
+      #echo "PRIVMSG $chan :Goodbye from $host!" >> .botfile
+      kill $$ #die die die current bash
+      kill `ps aux | grep $USER | grep -v grep | grep .botfile | awk '{print $2}'`
+      exit 3; #3 for killed becase, yeah
+    fi
   fi
+
 done
