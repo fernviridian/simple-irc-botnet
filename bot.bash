@@ -7,6 +7,7 @@ if [ $2 != '' ] && [ -f $2 ] ; then
 fi
 
 host=`hostname`
+botmaster="benji"
 
 #botname
 ircnick=$host-"bot"
@@ -29,13 +30,14 @@ tail -f .botfile | openssl s_client -connect irc.cat.pdx.edu:6697 | while true; 
     echo "PONG" >> .botfile
   elif `echo $irc | grep PRIVMSG | grep "$listencommand" > /dev/null` ; then
     nick="${irc%%!*}"; nick="${nick#:}"
-    if [[ $nick != $ircnick ]] ; then
+    if [[ $nick != $ircnick ]] && [[ $nick == $botmaster ]] ; then
+      echo "NICK: $nick"
       chan=`echo $irc | cut -d ' ' -f 3`
       echo "PRIVMSG $chan :Hello from $host!" >> ./.botfile
     fi
   elif `echo $irc | grep PRIVMSG | grep "$killcode" > /dev/null` ; then
     nick="${irc%%!*}"; nick="${nick#:}"
-    if [[ $nick != $ircnick ]] ; then
+    if [ $nick != $ircnick ] && [ $nick == $botmaster ] ; then
       chan=`echo $irc | cut -d ' ' -f 3`
       #echo "PRIVMSG $chan :Goodbye from $host!" >> ./.botfile
       kill $$ #die die die current bash
