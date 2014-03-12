@@ -13,3 +13,7 @@ if they need to be killed manually
 
 `./kill.bash`
 
+Why?
+--------
+
+Why not build a centrallized way to send commands to lots of computers for them to process. 
